@@ -1,6 +1,9 @@
 const express = require("express");
 
-// configuration pour l'accès à MongoDB
+// ------------------------------------------------------------------------------------------
+// Configuration MongoDB
+// ------------------------------------------------------------------------------------------
+
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
 
@@ -24,6 +27,7 @@ const client = new MongoClient(uri, {
 
 let connexion;
 
+
 // Création de la fonction qui lance la lecture de MongoDB
 async function run() {
   try {
@@ -38,8 +42,11 @@ async function run() {
 
 run();
 
-// Route de récupération de donnée sur MongoDB
+// ------------------------------------------------------------------------------------------
+// Création des routes
+// ------------------------------------------------------------------------------------------
 
+// Route de récupération de donnée sur MongoDB
 app.get("/connaissance", async (req, res) => {
   const { id } = req.body;
   try {
@@ -57,6 +64,62 @@ app.get("/connaissance", async (req, res) => {
     }
   } catch (err) {
     return res.status(500).json({ erreur: err });
+  }
+});
+
+// Route d'alimentation de la base MongoDB
+app.post("/alimentation", async (req, res) => {
+  const {
+    titre,
+    type,
+    technologies,
+    contenu,
+    description,
+    projet,
+    fichier,
+    tags
+  } = req.body;
+
+  if (!titre || !type || !contenu) {
+    return res.status(400).json({
+      message: "Les champs titre, type et contenu sont obligatoires"
+    });
+  }
+
+  try {
+    const nouvelleConnaissance = {
+      titre,
+      type,
+      technologies: technologies || [],
+      contenu,
+      description: description || "",
+      projet: projet || "",
+      fichier: fichier || null,
+      tags: tags || [],
+      date_ajout: new Date(),
+      date_modification: new Date()
+    };
+
+    const result = await connexion
+      .db("brainboxlola")
+      .collection("connaissances_techniques")
+      .insertOne(nouvelleConnaissance);
+
+    return res.status(201).json({
+      message: "Connaissance technique ajoutée avec succès",
+      id: result.insertedId,
+      connaissance: {
+        _id: result.insertedId,
+        ...nouvelleConnaissance
+      }
+    });
+  } catch (err) {
+    console.error("Erreur MongoDB :", err);
+
+    return res.status(500).json({
+      message: "Erreur lors de l'ajout dans MongoDB",
+      erreur: err.message
+    });
   }
 });
 

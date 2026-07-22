@@ -8,7 +8,11 @@ Afin de vous accompagner tout au long de votre parcours, vous allez créer un se
 
 Contrairement aux assistants IA classiques, BrainBox ne devra jamais s'appuyer sur ses connaissances générales pour répondre. L'assistant devra construire chacune de ses réponses uniquement à partir des informations enregistrées par son utilisateur. Si les connaissances disponibles sont insuffisantes, il devra l'indiquer explicitement plutôt que d'inventer une réponse.
 
-## Intialisation du back
+
+---
+## Orchestration
+
+### Git
 
 - Clonage du repo GitHub brainbox_back
 ```bash
@@ -16,17 +20,159 @@ https://github.com/lolahack-ux/brainbox_back.git
 ```
 - création d'un fichier **.gitignore**
 
+### Docker
+
+- Docker
+- Docker Compose
+
+1. Vérifier les installations :
+
+```bash
+docker --version
+docker compose version
+```
+
+2. Construction des images
+
+Pour construire les images Docker :
+
+```bash
+docker compose build
+```
+
+3. Lancement des conteneurs
+
+Pour démarrer l'application :
+
+```bash
+docker compose up
+```
+
+4. Arrêt de l'application
+
+Pour arrêter les conteneurs :
+
+```bash
+docker compose down
+```
+
+Pour arrêter les conteneurs et supprimer les volumes associés :
+
+```bash
+docker compose down -v
+```
+
+5. Ports utilisés
+
+| Service | Port hôte | Port conteneur |
+|----------|----------:|---------------:|
+| frontend | 4200 | 4200 |
+| backend  | 3000 | 3001 |
+
+
+6. Services disponibles
+
+L'application est composée des services suivants :
+
+- **frontend** : l'application Angular.
+- **database** : base de données.
+- **backend** : API en express et ETL en python.
+
+
+
+---
+## Création base de données sur MongoDB
+- Téléchargement de **MongoDB Compass**
+  - Connexion à Atlas MongoDB : https://www.mongodb.com/products/platform
+- Connexion du backend à MongoDB
+
+```bash
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
+
+const uri = process.env.MONGODB_URI;
+const databaseName = process.env.MONGODB_DATABASE;
+
+const uri =
+  "mongodb+srv://erhartlola_db_user:0vhR79Kr1psnHtF7@brainbox.vkxqlyz.mongodb.net/";
+
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
+
+let connexion;
+
+// Création de la fonction qui lance la lecture de MongoDB
+async function run() {
+  try {
+    connexion = await client.connect();
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!",
+    );
+  } catch (err) {
+    console.error(err);
+  }
+}
+run();
+```
+- Définir un port d'écoute
+```bash
+const PORT = 3001;
+app.listen(PORT, () => {
+  console.log(`Serveur démarré sur le port ${PORT}`);
+});
+```
+
+
+---
+## Intialisation du back
+
 - Installation express
 ```bash
 npm install express
 ```
+
 - Installation node
 ```bash
 npm init -y
 ```
+
 - Création du fichier **index.js**
 - Initialisation de Docker sur le dossier
   - création fichier **.dockerignore**
   - création d'un premier **Dockerfile**
   - création dans le dossier parent de back le fichier **compose.yaml**
+  - Création d'un fichier **.env** sur le dossier parent du back 
+- 
+  
+---
+## Création des routes
 
+- Route de récupération d'information sur la base de donnée MongoDB
+Pour que la route se connecte à la bas il faut rajouter le *try* pour la connexion.
+
+```bash
+app.get("/connaissance", async (req, res) => {
+  const { id } = req.body;
+  try {
+    const result = await connexion
+      .db("brainboxlola")
+      .collection("connaissances_techniques")
+      .findOne({
+        _id: new ObjectId(id),
+      });
+
+    if (result) {
+      return res.status(200).json(result);
+    } else {
+      return res.status(404).json({ message: "Non trouvé" });
+    }
+  } catch (err) {
+    return res.status(500).json({ erreur: err });
+  }
+});
+```
