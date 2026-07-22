@@ -1,21 +1,17 @@
-const { findUserByMailAndPassword } = require('../modelsCrud/rechercheModel');
+const { recuperationConnaissanceById } = require('../modelsCrud/rechercheModel');
 
 rechercheConnaissance = async (req, res) => {
   const { id } = req.body;
   try {
-    const result = await connexion
-      .db("brainboxlola")
-      .collection("connaissances_techniques")
-      .findOne({
-        _id: new ObjectId(id),
-      });
-
-    if (result) {
-      return res.status(200).json(result);
+   const recupConnaissance = await recuperationConnaissanceById(id);
+    if (recupConnaissance) {
+      return res.status(200).json(recupConnaissance);
     } else {
       return res.status(404).json({ message: "Non trouvé" });
     }
   } catch (err) {
-    return res.status(500).json({ erreur: err });
+    return res.status(500).json({ message: "erreur" , erreur: err });
   }
 };
+
+module.exports = {rechercheConnaissance};

@@ -25,13 +25,12 @@ const client = new MongoClient(uri, {
   },
 });
 
-let connexion;
 
 
 // Création de la fonction qui lance la lecture de MongoDB
 async function run() {
   try {
-    connexion = await client.connect();
+    global.connexion = await client.connect();
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
@@ -45,27 +44,28 @@ run();
 // ------------------------------------------------------------------------------------------
 // Création des routes
 // ------------------------------------------------------------------------------------------
-
+const rechecheRoute = require('./routersCrud/rechercheRouter');
+app.use(rechecheRoute);
 // Route de récupération de donnée sur MongoDB
-app.get("/connaissance", async (req, res) => {
-  const { id } = req.body;
-  try {
-    const result = await connexion
-      .db("brainboxlola")
-      .collection("connaissances_techniques")
-      .findOne({
-        _id: new ObjectId(id),
-      });
+// app.get("/connaissance", async (req, res) => {
+//   const { id } = req.body;
+//   try {
+//     const result = await connexion
+//       .db("brainboxlola")
+//       .collection("connaissances_techniques")
+//       .findOne({
+//         _id: new ObjectId(id),
+//       });
 
-    if (result) {
-      return res.status(200).json(result);
-    } else {
-      return res.status(404).json({ message: "Non trouvé" });
-    }
-  } catch (err) {
-    return res.status(500).json({ erreur: err });
-  }
-});
+//     if (result) {
+//       return res.status(200).json(result);
+//     } else {
+//       return res.status(404).json({ message: "Non trouvé" });
+//     }
+//   } catch (err) {
+//     return res.status(500).json({ erreur: err });
+//   }
+// });
 
 // Route d'alimentation de la base MongoDB
 app.post("/alimentation", async (req, res) => {
@@ -100,7 +100,7 @@ app.post("/alimentation", async (req, res) => {
       date_modification: new Date()
     };
 
-    const result = await connexion
+    const result = await global.connexion
       .db("brainboxlola")
       .collection("connaissances_techniques")
       .insertOne(nouvelleConnaissance);
