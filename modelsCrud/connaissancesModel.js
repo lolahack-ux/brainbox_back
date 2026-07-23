@@ -38,14 +38,21 @@ async function findByTag(tag) {
   return result;
 }
 
-async function updateConnaissance(modifConnaissance) {
+async function updateConnaissance(id, modifConnaissance) {
   const result = await global.connexion
     .db("brainboxlola")
     .collection("connaissances_techniques")
-    .updateOne(filter(id),update(modifConnaissance));
+    .updateOne(
+      {
+        _id: new ObjectId(id)
+      },
+      {
+        $set: modifConnaissance
+      }
+    );
+
   return result;
 }
-
 
 module.exports = {
   recuperationConnaissanceById,
@@ -54,3 +61,4 @@ module.exports = {
   findByTag,
   updateConnaissance,
 };
+

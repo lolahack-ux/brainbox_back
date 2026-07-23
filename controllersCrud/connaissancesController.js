@@ -1,4 +1,5 @@
-const { nouvelleConnaissance, recuperationConnaissanceById, findAllConnaissances, findByTag } = require("../modelsCrud/connaissancesModel");
+const { nouvelleConnaissance, recuperationConnaissanceById, findAllConnaissances, findByTag, updateConnaissance } = require("../modelsCrud/connaissancesModel");
+const { ObjectId } = require("mongodb");
 
 alimentationConnaissance = async (req, res) => {
   const {
@@ -92,7 +93,10 @@ const { tag } = req.body;
   }
 };
 
-modifDocument = async (req, res) => {
+
+const modifDocument = async (req, res) => {
+  const { id } = req.params;
+
   const {
     titre,
     type,
@@ -101,39 +105,69 @@ modifDocument = async (req, res) => {
     description,
     projet,
     fichier,
-    tags,
+    tags
   } = req.body;
 
-  const modifConnaissance = {
-    titre,
-    type,
-    technologies: technologies || [],
-    contenu,
-    description: description || "",
-    projet: projet || "",
-    fichier: fichier || null,
-    tags: tags || [],
-    date_ajout: new Date(),
-    date_modification: new Date(),
-  };
-
   try {
-    const resultatModif = await updateConnaissance(modifConnaissance);
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Identifiant MongoDB invalide"
+      });
+    }
 
-    return res.status(201).json({
-      message: "Connaissance technique modifié avec succès",
-      id: resultatModif.insertedId,
-      resultatModif,
+    const modifConnaissance = {
+      titre,
+      type,
+      technologies,
+      contenu,
+      description,
+      projet,
+      fichier,
+      tags,
+      date_modification: new Date()
+    };
+
+    // Supprime les champs qui valent undefined.
+    Object.keys(modifConnaissance).forEach((champ) => {
+      if (modifConnaissance[champ] === undefined) {
+        delete modifConnaissance[champ];
+      }
+    });
+
+    const resultatModif = await updateConnaissance(
+      id,
+      modifConnaissance
+    );
+
+    if (resultatModif.matchedCount === 0) {
+      return res.status(404).json({
+        message: "Aucune connaissance trouvée avec cet identifiant"
+      });
+    }
+
+    if (resultatModif.modifiedCount === 0) {
+      return res.status(200).json({
+        message: "Document trouvé, mais aucune modification n'était nécessaire"
+      });
+    }
+
+    return res.status(200).json({
+      message: "Connaissance technique modifiée avec succès",
+      resultat: {
+        matchedCount: resultatModif.matchedCount,
+        modifiedCount: resultatModif.modifiedCount
+      }
     });
   } catch (err) {
     console.error("Erreur MongoDB :", err);
 
     return res.status(500).json({
       message: "Erreur lors de la modification dans MongoDB",
-      erreur: err.message,
+      erreur: err.message
     });
   }
 };
 
-module.exports = { rechercheConnaissance, alimentationConnaissance, getAllConnaissances,getAlltags, modifDocument};
+
+module.exports = { rechercheConnaissance, alimentationConnaissance, getAllConnaissances, getAlltags, modifDocument};
 
