@@ -75,7 +75,6 @@ docker compose down -v
 L'application est composée des services suivants :
 
 - **frontend** : l'application Angular.
-- **database** : base de données.
 - **backend** : API en express et ETL en python.
 
 
@@ -147,7 +146,6 @@ npm init -y
   - création d'un premier **Dockerfile**
   - création dans le dossier parent de back le fichier **compose.yaml**
   - Création d'un fichier **.env** sur le dossier parent du back 
-- 
   
 ---
 ## Création des routes
@@ -175,4 +173,42 @@ app.get("/connaissance", async (req, res) => {
     return res.status(500).json({ erreur: err });
   }
 });
+```
+## Création des conteners du back
+- Dans le fichier compose.yaml pour le contener backend
+```bash
+backend:
+    build : ./back
+    image: back_requete_api
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_DATABASE: ${MONGODB_DATABASE}
+
+    ports:
+      - "3001:3001"
+```
+puis dans le volume des services :
+```bash
+volumes:
+  mongodb_data:
+  ollama_data:
+```
+
+### Insertion IA Ollama
+- Création du contener d'Ollama dans le compose.yaml
+```bash
+langage:
+    image: ollama/ollama:latest
+    container_name: brainbox_ollama
+
+    ports:
+      - "11434:11434"
+
+    volumes:
+      - ollama_data:/root/.ollama
+```
+- Créer les images avec les commandes ci-dessus dans la rubrique Docker
+- Une fois les conteners créer mettre dans le terminal du dossier du compose.yaml, pour télécharger le modèle d'Ollama utilisé. Ici modele : llama3.2
+```bash
+docker compose exec langage ollama pull llama3.2
 ```

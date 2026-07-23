@@ -1,5 +1,6 @@
 const { nouvelleConnaissance, recuperationConnaissanceById, findAllConnaissances, findByTag, updateConnaissance } = require("../modelsCrud/connaissancesModel");
 const { ObjectId } = require("mongodb");
+const axios = require("axios");
 
 alimentationConnaissance = async (req, res) => {
   const {
@@ -169,5 +170,56 @@ const modifDocument = async (req, res) => {
 };
 
 
-module.exports = { rechercheConnaissance, alimentationConnaissance, getAllConnaissances, getAlltags, modifDocument};
+const getAssistant = async (req, res) => {
+  const { tag } = req.body;
+
+  if (!tag) {
+    return res.status(400).json({
+      message: "Le champ tag est obligatoire"
+    });
+  }
+
+  try {
+    const recupByTag = await findByTag(tag);
+
+    if (!recupByTag || recupByTag.length === 0) {
+      return res.status(404).json({
+        message: "Aucune connaissance trouvée avec ce tag"
+      });
+    }
+
+    const prompt = `Voici des informations techniques trouvées dans ma base :
+    ${JSON.stringify(recupByTag, null, 2)}
+    Peux-tu m'expliquer clairement les informations importantes concernant le tag "${tag}" ?`;
+
+    const reponseOllama = await axios.post(
+      "http://langage:11434/api/generate",
+      {
+        model: "llama3.2",
+        prompt: prompt,
+        stream: false
+      }
+    );
+
+    return res.status(200).json({
+      tag: tag,
+      connaissances: recupByTag,
+      reponse_ia: reponseOllama.data.response
+    });
+  } catch (err) {
+    console.error("Erreur assistant :", err.response?.data || err.message);
+
+    return res.status(500).json({
+      message: "Erreur lors de l'appel à l'assistant",
+      erreur: err.response?.data || err.message
+    });
+  }
+};
+
+module.exports = {
+  getAssistant
+};
+
+
+module.exports = { rechercheConnaissance, alimentationConnaissance, getAllConnaissances, getAlltags, modifDocument, getAssistant};
 
