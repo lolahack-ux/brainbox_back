@@ -45,7 +45,7 @@ run();
 // ------------------------------------------------------------------------------------------
 
 const connaissancesRoutes = require ('./routersCrud/connaissancesRouter');
-app.use(connaissancesRoutes);
+app.use(connaissancesRoutes); 
 
 
 // app.post("/alimentation", async (req, res) => {

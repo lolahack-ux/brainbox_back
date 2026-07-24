@@ -7,10 +7,12 @@ const router = express.Router();
 router.post('/alimentation', connaissanceController.alimentationConnaissance);
 router.get('/connaissance', connaissanceController.rechercheConnaissance);
 router.get('/allConnaissances', connaissanceController.getAllConnaissances);
-router.get('/alltags', connaissanceController.getAlltags);
+router.get('/findByTag', connaissanceController.findByTag_);
 router.put('/updatedoc/:id',connaissanceController.modifDocument);
+
 router.post('/assistant', connaissanceController.getAssistant);
 
-module.exports = router;
 
-module.exports = router
+router.get('/getAllTags', connaissanceController.getAllTags_);
+
+module.exports = router;
