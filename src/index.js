@@ -15,8 +15,7 @@ const databaseName = process.env.MONGODB_DATABASE;
 const app = express();
 app.use(express.json());
 
-const uri =
-  "mongodb+srv://erhartlola_db_user:0vhR79Kr1psnHtF7@brainbox.vkxqlyz.mongodb.net/";
+const uri = "mongodb+srv://erhartlola_db_user:0vhR79Kr1psnHtF7@brainbox.vkxqlyz.mongodb.net/"; 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
 const client = new MongoClient(uri, {
@@ -108,7 +107,8 @@ app.use(connaissancesRoutes);
 // });
 
 // port de lancement du serveur
-const PORT = 3001;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
 });

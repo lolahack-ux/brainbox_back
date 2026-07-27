@@ -239,13 +239,13 @@ Règles :
     console.log(prompt);
 
     const reponseOllama = await axios.post(
-      "http://localhost:11434/api/generate",
-      {
-        model: "llama3.2",
-        prompt: prompt,
-        stream: false,
-      }
-    );
+  "http://langage:11434/api/generate",
+  {
+    model: "llama3.2",
+    prompt: prompt,
+    stream: false,
+  }
+);
 
     return res.status(200).json({
       tags: Array.from(tagsPertinents),
