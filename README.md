@@ -206,9 +206,27 @@ langage:
 
     volumes:
       - ollama_data:/root/.ollama
+      
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
 ```
+Il vaut mieux prendre cette conféigation pour faire tourner Ollama sur le gpu, pour éviter qu'il soit trop lent.
 - Créer les images avec les commandes ci-dessus dans la rubrique Docker
 - Une fois les conteners créer mettre dans le terminal du dossier du compose.yaml, pour télécharger le modèle d'Ollama utilisé. Ici modele : llama3.2
 ```bash
 docker compose exec langage ollama pull llama3.2
+```
+Pour éviter des problèmes entre Angular et Express de port, car ils n'utilisent pas le même faire dans le terminal du back:
+```bash
+npm install cors
+```
+Puis dans index.js
+```bash
+const cors = require("cors");
 ```

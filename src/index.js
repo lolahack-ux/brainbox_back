@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 
 
 // ------------------------------------------------------------------------------------------
@@ -39,6 +40,9 @@ async function run() {
   }
 }
 run();
+
+app.use(cors());
+app.use(express.json());
 
 // ------------------------------------------------------------------------------------------
 // Création des routes

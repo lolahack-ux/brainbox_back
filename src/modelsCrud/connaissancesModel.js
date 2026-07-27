@@ -64,13 +64,23 @@ async function findByTags(tags) {
   const result = await global.connexion
     .db("brainboxlola")
     .collection("connaissances_techniques")
-    .find({
-      tags: {
-        $in: tags,
+    .find(
+      {
+        tags: {
+          $in: tags
+        }
       },
-    })
+      {
+        projection: {
+          _id: 0,
+          date_ajout: 0,
+          date_modification: 0
+        }
+      }
+    )
     .toArray();
-    console.log(result)
+
+  console.log(result);
 
   return result;
 }
