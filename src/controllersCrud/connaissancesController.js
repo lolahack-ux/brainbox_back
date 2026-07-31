@@ -65,24 +65,29 @@ const alimentationConnaissance = async (req, res) => {
 // Controller pour ajouter des connaissances utiliser dans la route get connaissance
 const rechercheConnaissance = async (req, res) => {
   const { id } = req.query;
+
+  console.log("ID reçu par le backend :", id);
+
   try {
-      if (!id) {
-    return res.status(400).json({
-      message: "L'identifiant est obligatoire",
-    });
-    }
-    // Attendre la réponse du Model recuperationConnaissanceById
-    const recupConnaissance = await recuperationConnaissanceById(id);
+    const recupConnaissance =
+      await recuperationConnaissanceById(id);
+
     if (recupConnaissance) {
       return res.status(200).json(recupConnaissance);
-    } else {
-      return res.status(404).json({ message: "Non trouvé" });
     }
+
+    return res.status(404).json({
+      message: "Non trouvé",
+    });
   } catch (err) {
-    return res.status(500).json({ message: "erreur", erreur: err });
+    console.error("Erreur recherche connaissance :", err);
+
+    return res.status(500).json({
+      message: "Erreur",
+      erreur: err.message,
+    });
   }
 };
-
 // Controller pour ajouter des connaissances utiliser dans la route get Allconnaissance
 const getAllConnaissances = async (req, res) => {
   try {
