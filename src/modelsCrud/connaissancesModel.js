@@ -27,17 +27,17 @@ async function findAllConnaissances() {
   return result;
 }
 
-async function findByTag(tag) {
-  const result = await global.connexion
-    .db("brainboxlola")
-    .collection("connaissances_techniques")
-    .find({
-      tags: tag
-    },
-    )
-    .toArray();
-  return result;
-}
+// async function findByTag(tag) {
+//   const result = await global.connexion
+//     .db("brainboxlola")
+//     .collection("connaissances_techniques")
+//     .find({
+//       tags: tag
+//     },
+//     )
+//     .toArray();
+//   return result;
+// }
 
 async function findAllTags() { 
   const result = await global.connexion
@@ -105,7 +105,7 @@ module.exports = {
   recuperationConnaissanceById,
   nouvelleConnaissance,
   findAllConnaissances,
-  findByTag,
+  // findByTag,
   updateConnaissance,
   findAllTags,
   findByTags,

@@ -2,7 +2,7 @@ const {
   nouvelleConnaissance,
   recuperationConnaissanceById,
   findAllConnaissances,
-  findByTag,
+  // findByTag,
   updateConnaissance,
   findAllTags,
   findByTags
@@ -10,7 +10,8 @@ const {
 const { ObjectId } = require("mongodb");
 const axios = require("axios");
 
-alimentationConnaissance = async (req, res) => {
+// Controller pour ajouter des connaissances utiliser dans la route post alimentation
+const alimentationConnaissance = async (req, res) => {
   const {
     titre,
     type,
@@ -43,6 +44,7 @@ alimentationConnaissance = async (req, res) => {
   };
 
   try {
+    // Attendre la réponse du Model nouvelleConnaissance
     const resultatAjout = await nouvelleConnaissance(nvConnaissance);
 
     return res.status(201).json({
@@ -60,9 +62,16 @@ alimentationConnaissance = async (req, res) => {
   }
 };
 
-rechercheConnaissance = async (req, res) => {
-  const { id } = req.body;
+// Controller pour ajouter des connaissances utiliser dans la route get connaissance
+const rechercheConnaissance = async (req, res) => {
+  const { id } = req.query;
   try {
+      if (!id) {
+    return res.status(400).json({
+      message: "L'identifiant est obligatoire",
+    });
+    }
+    // Attendre la réponse du Model recuperationConnaissanceById
     const recupConnaissance = await recuperationConnaissanceById(id);
     if (recupConnaissance) {
       return res.status(200).json(recupConnaissance);
@@ -74,8 +83,10 @@ rechercheConnaissance = async (req, res) => {
   }
 };
 
-getAllConnaissances = async (req, res) => {
+// Controller pour ajouter des connaissances utiliser dans la route get Allconnaissance
+const getAllConnaissances = async (req, res) => {
   try {
+    // Attendre la réponse du Model findAllConnaissances
     const recupConnaissance = await findAllConnaissances();
     if (recupConnaissance) {
       return res.status(200).json(recupConnaissance);
@@ -87,20 +98,22 @@ getAllConnaissances = async (req, res) => {
   }
 };
 
-findByTag_ = async (req, res) => {
-  const { tag } = req.body;
+// Controller pour ajouter des connaissances utiliser dans la route get findbyTag
+// findByTag_ = async (req, res) => {
+//   const { tag } = req.body;
 
-  try {
-    const recupByTag = await findByTag(tag);
-    if (recupByTag) {
-      return res.status(200).json(recupByTag);
-    } else {
-      return res.status(404).json({ message: "Non trouvé" });
-    }
-  } catch (err) {
-    return res.status(500).json({ message: "erreur", erreur: err });
-  }
-};
+//   try {
+//     // Attendre la réponse du Model findByTag
+//     const recupByTag = await findByTag(tag);
+//     if (recupByTag) {
+//       return res.status(200).json(recupByTag);
+//     } else {
+//       return res.status(404).json({ message: "Non trouvé" });
+//     }
+//   } catch (err) {
+//     return res.status(500).json({ message: "erreur", erreur: err });
+//   }
+// };
 
 const modifDocument = async (req, res) => {
   const { id } = req.params;
@@ -109,7 +122,7 @@ const modifDocument = async (req, res) => {
     titre,
     type,
     technologies,
-    contenu,
+    code,
     description,
     projet,
     fichier,
@@ -127,7 +140,7 @@ const modifDocument = async (req, res) => {
       titre,
       type,
       technologies,
-      contenu,
+      code,
       description,
       projet,
       fichier,
@@ -265,7 +278,7 @@ Règles :
   }
 };
 
-getAllTags_ = async (req, res) => {
+const getAllTags_ = async (req, res) => {
 
   try {
     const tags = await findAllTags();
@@ -283,7 +296,7 @@ module.exports = {
   rechercheConnaissance,
   alimentationConnaissance,
   getAllConnaissances,
-  findByTag_,
+  // findByTag_,
   modifDocument,
   getAssistant,
   getAllTags_
