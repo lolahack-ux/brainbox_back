@@ -77,7 +77,18 @@ L'application est composée des services suivants :
 - **frontend** : l'application Angular.
 - **backend** : API en express et ETL en python.
 
+7. Envoyer les conterners sur Dockers hub
 
+- Renommer les images dans le compose.yaml en mettant de le nom de l'identifiant de la personne devant.
+- Vérifier le fichiers dockerignore
+- Puis depuis le dossier qui contient le compose.yaml
+```bash
+docker compose build backend frontend
+
+ou
+
+docker compose up -d --build
+```
 
 ---
 ## Création base de données sur MongoDB
